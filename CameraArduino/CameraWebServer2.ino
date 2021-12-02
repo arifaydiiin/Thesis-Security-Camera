@@ -3,8 +3,10 @@
 #include <WebSocketsServer.h>
 #include "FS.h"
 #include "SPI.h"
+#include "SD.h"
 #include "EEPROM.h"
 #include "driver/rtc_io.h"
+#include "ESP32_MailClient.h"
 
 
 #define CAMERA_MODEL_AI_THINKER
@@ -22,12 +24,6 @@ WebSocketsServer webSocket = WebSocketsServer(8888);
 const char* ssid = "TAKUHAN2";
 const char* password = "12345678.";
 
-const char* ssidW = "Kablonet Netmaster-6DEE-G";
-const char* passwordW = "gulerayse8041";
-
-String FIREBASE_HOST = "esp32-cam-deneme-default-rtdb.firebaseio.com";
-String FIREBASE_AUTH = "mchDd6CE09KWz961IxIeZDN9WlcXEnM7wjrzrSey";
-
 bool isClientConnected;
 
 void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length) {
@@ -38,8 +34,6 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t length
             break;
         case WStype_CONNECTED:
             {
-                Serial.print("Num değeri : ");
-                Serial.println(num);
                 IPAddress ip = webSocket.remoteIP(num);
                 Serial.print("Connected IP address:");
                 Serial.println(ip);
@@ -105,6 +99,13 @@ void setup() {
 
   
   //***
+   Serial.println("Mounting SD Card...");
+
+  if(!SD.begin())
+  {
+    Serial.println("Card Mount Failed");
+    return;
+  }
 
   // EEPROM'u başlatıyoruz.
   if (!EEPROM.begin(EEPROM_SIZE))
@@ -149,6 +150,23 @@ void setup() {
   //Fotoğraf için veri yolu ve isim oluşturuluyor.
   String path = "/IMG" + String(nextImageNumber) + ".jpg";
     
+  fs::FS &fs = SD;
+
+  //Yeni bir dosya oluşturuluyor.
+  File file = fs.open(path.c_str(), FILE_WRITE);
+  if(!file)
+  {
+    Serial.println("Failed to create file");
+    Serial.println("Exiting now"); 
+    while(1);   //Bir hata oluştuysa bu satırda bekleniyor.    
+  } 
+  else 
+  {
+    file.write(fb->buf, fb->len); 
+    EEPROM.put(COUNT_ADDRESS, nextImageNumber);
+    EEPROM.commit();
+  }
+  file.close();
 
   //Kameranın frame buffer bilgisi gönderiliyor.
   esp_camera_fb_return(fb);
