@@ -14,8 +14,8 @@ FirebaseData firebaseData;
 
 String FIREBASE_HOST = "camerasecurity-955a4-default-rtdb.firebaseio.com";
 String FIREBASE_AUTH = "pWLVVRSuPxoeRTa0hKdVJyziOoTYtfL535kulvlM";
-const char* ssid = "Kablonet Netmaster-6DEE-G";
-const char* password = "gulerayse8041";
+const char* ssid = "---";
+const char* password = "---";
 char auth[] = "kQ9o478gY3tebxFHGlq6R--ZuPJ4DBrq";  //sent by Blynk
 const char* websocket_server_host = "192.168.0.14";//++
 const uint16_t websocket_server_port = 8888; //++
