@@ -25,8 +25,8 @@ class _BlinkingTimerState extends State<BlinkingTimer>
     currentTime = DateTime.now();
     _timer = Timer.periodic(Duration(seconds: 1), (Timer t) => _getTimer());
   }
-
-  @override
+  
+ @override
   void dispose() {
     _animationController.dispose();
     _timer.cancel();
